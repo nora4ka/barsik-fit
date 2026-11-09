@@ -1,0 +1,349 @@
+:root {
+  --bg-main: #FAF8F5;
+  --surface: #FFFFFF;
+  --text-dark: #2B2A27;
+  --text-muted: #8E8A83;
+  --primary: #D4A373;
+  --primary-hover: #C59362;
+  --accent-protein: #E07A5F;
+  --accent-fat: #F4A261;
+  --accent-carb: #81B29A;
+  --border-subtle: #EFECE6;
+  --radius-card: 20px;
+  --radius-btn: 14px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-dark);
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+#app-container {
+  width: 100%;
+  max-width: 480px;
+  background: var(--bg-main);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 0 40px rgba(0,0,0,0.04);
+}
+
+header {
+  padding: 20px 20px 12px;
+  background: var(--bg-main);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-top h1 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text-dark);
+}
+
+.sync-status {
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: #E8F5E9;
+  color: #2E7D32;
+  font-weight: 600;
+}
+
+.sync-status.offline {
+  background: #FFF3E0;
+  color: #E65100;
+}
+
+main {
+  flex: 1;
+  padding: 0 20px 100px;
+  overflow-y: auto;
+}
+
+.tab-pane {
+  display: none;
+  flex-direction: column;
+  gap: 16px;
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+.tab-pane.active {
+  display: flex;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card {
+  background: var(--surface);
+  border-radius: var(--radius-card);
+  padding: 18px;
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+}
+
+/* Питомец Барсик */
+.pet-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  background: linear-gradient(135deg, #FFFDFB 0%, #F5EFEB 100%);
+  border: 1px solid #EADBCC;
+}
+
+.pet-avatar {
+  width: 96px;
+  height: 96px;
+  flex-shrink: 0;
+}
+
+.pet-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pet-name {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.pet-state {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.pet-msg {
+  font-size: 0.78rem;
+  color: var(--primary);
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+/* Прогресс-бары */
+.macro-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.macro-item {
+  background: #FAF8F5;
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+}
+
+.macro-val {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.macro-lbl {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.bar-bg {
+  width: 100%;
+  height: 6px;
+  background: #EBE7DF;
+  border-radius: 6px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.3s ease;
+}
+
+.fill-cal { background: var(--primary); }
+.fill-pro { background: var(--accent-protein); }
+.fill-fat { background: var(--accent-fat); }
+.fill-carb { background: var(--accent-carb); }
+
+/* Кнопки и формы */
+button {
+  cursor: pointer;
+  border: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  padding: 14px;
+  border-radius: var(--radius-btn);
+  width: 100%;
+  font-size: 0.95rem;
+}
+
+.btn-primary:active {
+  background: var(--primary-hover);
+  transform: scale(0.99);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  padding: 10px 14px;
+  border-radius: var(--radius-btn);
+  font-size: 0.85rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.input-group label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #E2DDD5;
+  background: #FAF8F5;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+input:focus, select:focus {
+  border-color: var(--primary);
+  background: #FFFFFF;
+}
+
+/* Карточки стратегий тренера */
+.strategy-card {
+  background: #FAF8F5;
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 10px;
+  border: 1px solid #ECE7DE;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.strategy-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-dark);
+  display: flex;
+  justify-content: space-between;
+}
+
+.strategy-macros {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+/* Списки */
+.item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #F0ECE4;
+}
+
+.item-row:last-child {
+  border-bottom: none;
+}
+
+.item-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.item-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Нижняя навигация */
+nav.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  max-width: 480px;
+  height: 68px;
+  background: var(--surface);
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 100;
+  box-shadow: 0 -4px 16px rgba(0,0,0,0.03);
+}
+
+.nav-btn {
+  background: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  padding: 8px 12px;
+}
+
+.nav-btn.active {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.nav-btn svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+}
+
+#scanner-wrapper {
+  position: relative;
+  width: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #000;
+  display: none;
+  margin-bottom: 12px;
+}
+
+#scanner-video {
+  width: 100%;
+  max-height: 240px;
+  object-fit: cover;
+}
