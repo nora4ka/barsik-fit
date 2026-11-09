@@ -18,13 +18,22 @@
   
   <header>
     <div class="header-top">
-      <h1 id="page-title">Сегодня</h1>
+      <h1 id="page-title">Дневник</h1>
       <span id="sync-badge" class="sync-status">Локально</span>
+    </div>
+
+    <!-- Переключатель дат -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; background:#FAF8F5; border:1px solid #ECE7DE; border-radius:14px; padding:6px 12px;">
+      <button class="btn-outline" style="padding:4px 10px; font-size:0.8rem;" onclick="app.shiftDate(-1)">←</button>
+      <div style="display:flex; align-items:center; gap:6px;">
+        <input type="date" id="current-date-picker" style="padding:4px 8px; font-weight:700; border:none; background:transparent; font-size:0.95rem; text-align:center; outline:none;" onchange="app.onDatePicked(this.value)">
+      </div>
+      <button class="btn-outline" style="padding:4px 10px; font-size:0.8rem;" onclick="app.shiftDate(1)">→</button>
     </div>
   </header>
 
   <main>
-    <!-- 1. ВКЛАДКА: СЕГОДНЯ -->
+    <!-- 1. ВКЛАДКА: ДНЕВНИК (ГЛАВНАЯ) -->
     <section id="tab-today" class="tab-pane active">
       
       <!-- Барсик -->
@@ -76,10 +85,10 @@
         </div>
       </div>
 
-      <!-- Сводка калорий дня -->
+      <!-- Сводка КБЖУ выбранного дня -->
       <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:baseline;">
-          <h2 style="font-size:1.1rem;">Калории за день</h2>
+          <h2 style="font-size:1.1rem;">Итог за день</h2>
           <span style="font-size:0.9rem; font-weight:700;"><span id="cur-cal">0</span> / <span id="goal-cal">1800</span> ккал</span>
         </div>
         <div class="bar-bg"><div class="bar-fill fill-cal" id="bar-cal" style="width: 0%;"></div></div>
@@ -103,25 +112,84 @@
         </div>
       </div>
 
-      <!-- Дневник съеденного -->
+      <!-- Быстрое добавление еды с поиском прямо на главной -->
+      <div class="card" style="border: 2px dashed var(--primary); background:#FCFAF7;">
+        <h3 style="font-size:1rem; margin-bottom:8px;">+ Быстро добавить продукт</h3>
+        
+        <div class="input-group">
+          <label>Куда записать</label>
+          <select id="main-meal-type">
+            <option value="breakfast">Завтрак</option>
+            <option value="lunch" selected>Обед</option>
+            <option value="dinner">Ужин</option>
+            <option value="snack">Перекус</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Поиск продукта (введите часть названия)</label>
+          <input type="text" id="main-prod-search" placeholder="Начните писать: творог, огурец..." oninput="app.searchMainProducts(this.value)">
+          <div id="main-search-results" style="max-height:160px; overflow-y:auto; border:1px solid #ECE7DE; border-radius:12px; background:#fff; display:none; margin-top:4px;"></div>
+        </div>
+
+        <div style="display:flex; gap:8px;">
+          <input type="number" id="main-prod-weight" placeholder="Грамм (например: 150)">
+          <button class="btn-primary" style="width:auto; padding:12px 18px;" onclick="app.logMainProduct()">Записать</button>
+        </div>
+        <input type="hidden" id="main-selected-prod-id">
+      </div>
+
+      <!-- Блоки по приёмам пищи -->
       <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-          <h3 style="font-size:1rem;">Съедено сегодня</h3>
-          <button class="btn-outline" onclick="app.clearDay()">Сбросить день</button>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <h3 style="font-size:1rem;">🍳 Завтрак</h3>
+          <span style="font-size:0.85rem; font-weight:700; color:var(--text-muted);"><span id="meal-cal-breakfast">0</span> ккал</span>
         </div>
-        <div id="today-list">
-          <p style="color:var(--text-muted); font-size:0.85rem;">Пока ничего не добавлено.</p>
+        <div id="list-breakfast" style="margin-top:8px;"></div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <h3 style="font-size:1rem;">🍲 Обед</h3>
+          <span style="font-size:0.85rem; font-weight:700; color:var(--text-muted);"><span id="meal-cal-lunch">0</span> ккал</span>
         </div>
+        <div id="list-lunch" style="margin-top:8px;"></div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <h3 style="font-size:1rem;">🥗 Ужин</h3>
+          <span style="font-size:0.85rem; font-weight:700; color:var(--text-muted);"><span id="meal-cal-dinner">0</span> ккал</span>
+        </div>
+        <div id="list-dinner" style="margin-top:8px;"></div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <h3 style="font-size:1rem;">🍎 Перекус</h3>
+          <span style="font-size:0.85rem; font-weight:700; color:var(--text-muted);"><span id="meal-cal-snack">0</span> ккал</span>
+        </div>
+        <div id="list-snack" style="margin-top:8px;"></div>
       </div>
 
     </section>
 
-    <!-- 2. ВКЛАДКА: КОНСТРУКТОР БЛЮД (САЛАТЫ) -->
+    <!-- 2. ВКЛАДКА: САЛАТЫ И КОНСТРУКТОР БЛЮД -->
     <section id="tab-recipe" class="tab-pane">
       <div class="card">
         <h3>Конструктор составного блюда</h3>
-        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">Соберите салат из ингредиентов и укажите вес съеденной порции.</p>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">Соберите салат или сложное блюдо из ингредиентов и укажите граммы съеденной порции.</p>
         
+        <div class="input-group">
+          <label>Куда добавить</label>
+          <select id="recipe-meal-type">
+            <option value="breakfast">Завтрак</option>
+            <option value="lunch" selected>Обед</option>
+            <option value="dinner">Ужин</option>
+            <option value="snack">Перекус</option>
+          </select>
+        </div>
+
         <div class="input-group">
           <label>Название блюда</label>
           <input type="text" id="recipe-name" placeholder="Например: Салат с огурцом и яйцом">
@@ -129,9 +197,12 @@
 
         <div style="background:#FAF8F5; padding:12px; border-radius:14px; margin-bottom:12px;">
           <div class="input-group">
-            <label>Выберите ингредиент</label>
-            <select id="recipe-prod-select"></select>
+            <label>Поиск ингредиента</label>
+            <input type="text" id="recipe-search-input" placeholder="Поиск (огурец, масло...)" oninput="app.searchRecipeIngredients(this.value)">
+            <div id="recipe-search-results" style="max-height:140px; overflow-y:auto; border:1px solid #ECE7DE; border-radius:10px; background:#fff; display:none; margin-top:4px;"></div>
           </div>
+          <input type="hidden" id="recipe-selected-prod-id">
+          
           <div class="input-group">
             <label>Сколько добавили в миску (грамм)</label>
             <input type="number" id="recipe-prod-weight" placeholder="100">
@@ -168,7 +239,7 @@
       </div>
 
       <div class="card">
-        <h3>Добавить продукт в базу</h3>
+        <h3>Добавить новый продукт в базу</h3>
         <div class="input-group">
           <label>Название продукта</label>
           <input type="text" id="p-name" placeholder="Творог 5%">
@@ -195,30 +266,26 @@
             <input type="number" id="p-carb" placeholder="3">
           </div>
         </div>
-        <button class="btn-primary" onclick="app.saveManualProduct()">Сохранить продукт</button>
+        <button class="btn-primary" onclick="app.saveManualProduct()">Сохранить продукт в базу</button>
       </div>
 
+      <!-- Список всех сохранённых продуктов -->
       <div class="card">
-        <h3>Съесть продукт из базы</h3>
+        <h3>Все продукты в базе (<span id="prods-count">0</span>)</h3>
         <div class="input-group">
-          <label>Продукт</label>
-          <select id="quick-prod-select"></select>
+          <input type="text" placeholder="Поиск по базе..." oninput="app.filterAllProducts(this.value)">
         </div>
-        <div class="input-group">
-          <label>Вес порции (грамм)</label>
-          <input type="number" id="quick-prod-weight" placeholder="150">
-        </div>
-        <button class="btn-primary" onclick="app.logSingleProduct()">Съедено</button>
+        <div id="all-products-list" style="max-height:260px; overflow-y:auto;"></div>
       </div>
     </section>
 
-    <!-- 4. ВКЛАДКА: ТРЕНЕР, НОРМЫ И ТРЕКЕР ВЕСА -->
+    <!-- 4. ВКЛАДКА: ТРЕНЕР, НОРМЫ И ВЕС -->
     <section id="tab-coach" class="tab-pane">
       
-      <!-- Трекер веса раз в неделю -->
+      <!-- Замеры веса -->
       <div class="card">
         <h3>Замер веса (контроль прогресса)</h3>
-        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">Вносите вес раз в неделю, чтобы отслеживать динамику сброса массы.</p>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">Вносите вес раз в неделю, чтобы видеть динамику.</p>
         
         <div style="display:flex; gap:8px;">
           <input type="number" step="0.1" id="new-weight-val" placeholder="Например: 63.5">
@@ -228,10 +295,10 @@
         <div id="weight-history-list" style="margin-top:14px;"></div>
       </div>
 
-      <!-- Фитнес-калькулятор -->
+      <!-- Калькулятор -->
       <div class="card">
         <h3>Тренерский калькулятор норм</h3>
-        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">Рассчитает КБЖУ под ваши рост и вес по формуле Миффлина-Сан Жеора.</p>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">Формула Миффлина-Сан Жеора.</p>
 
         <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:8px;">
           <div class="input-group">
@@ -256,32 +323,29 @@
         </div>
 
         <div class="input-group">
-          <label>Уровень активности</label>
+          <label>Активность</label>
           <select id="calc-activity">
             <option value="1.2">Минимум (сидячий образ жизни, без спорта)</option>
-            <option value="1.375">Легкая (прогулки, 1-2 легкие тренировки в неделю)</option>
+            <option value="1.375">Легкая (прогулки, 1-2 тренировки в неделю)</option>
             <option value="1.55" selected>Умеренная (тренировки 3-4 раза в неделю)</option>
-            <option value="1.725">Высокая (интенсивные нагрузки 5-6 раз в неделю)</option>
+            <option value="1.725">Высокая (тяжелые тренировки 5-6 раз)</option>
           </select>
         </div>
 
-        <button class="btn-primary" onclick="app.calculateCoachGoals()">Рассчитать нормы питания</button>
-
-        <!-- Карточки результатов с кнопками применения -->
+        <button class="btn-primary" onclick="app.calculateCoachGoals()">Рассчитать стратегии</button>
         <div id="coach-results" style="margin-top:14px; display:none;"></div>
       </div>
 
-      <!-- Ручная настройка КБЖУ -->
+      <!-- Ручные нормы -->
       <div class="card">
         <h3>Мои целевые нормы КБЖУ (вручную)</h3>
-        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">Вы можете в любой момент изменить калории и макронутриенты вручную под свои цели.</p>
         <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:8px;">
           <div class="input-group"><label>Калории (ккал)</label><input type="number" id="g-cal"></div>
           <div class="input-group"><label>Белки (г)</label><input type="number" id="g-pro"></div>
           <div class="input-group"><label>Жиры (г)</label><input type="number" id="g-fat"></div>
           <div class="input-group"><label>Углеводы (г)</label><input type="number" id="g-carb"></div>
         </div>
-        <button class="btn-outline" style="width:100%; margin-top:8px;" onclick="app.saveGoalsManual()">Сохранить эти нормы</button>
+        <button class="btn-outline" style="width:100%; margin-top:8px;" onclick="app.saveGoalsManual()">Сохранить нормы</button>
       </div>
 
       <!-- Firebase Облако -->
@@ -298,11 +362,11 @@
 
   </main>
 
-  <!-- Навигация снизу -->
+  <!-- Навигация -->
   <nav class="bottom-nav">
     <button class="nav-btn active" onclick="app.switchTab('today', this)">
       <svg fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-      <span>Сегодня</span>
+      <span>Дневник</span>
     </button>
     <button class="nav-btn" onclick="app.switchTab('recipe', this)">
       <svg fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
